@@ -3,7 +3,6 @@ version: "3.9"
 services:
   mongo:
     image: mongo:7
-    container_name: bookcars-mongo
     restart: always
     command: mongod --quiet --logpath /dev/null
     environment:
@@ -12,12 +11,9 @@ services:
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
-    ports:
-      - "27018:27017"
 
   mongo-express:
     image: mongo-express:latest
-    container_name: bookcars-mongo-express
     restart: always
     depends_on:
       - mongo
@@ -25,14 +21,9 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER}
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
-    ports:
-      - "8084:8081"
 
   bc-backend:
-    container_name: bookcars-backend
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+    image: aelassas/bookcars-backend:latest
     restart: always
     depends_on:
       - mongo
@@ -44,36 +35,25 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       CDN_FOLDER: /var/www/cdn/bookcars
       BACKEND_PORT: 4002
-    ports:
-      - "4002:4002"
     volumes:
       - cdn:/var/www/cdn/bookcars
       - backend_logs:/bookcars/backend/logs
 
   bc-admin:
-    container_name: bookcars-admin
-    build:
-      context: .
-      dockerfile: admin/Dockerfile
+    image: aelassas/bookcars-admin:latest
+    restart: always
     depends_on:
       - bc-backend
     environment:
       REACT_APP_API_BASE_URL: ${API_BASE_URL}
-    ports:
-      - "3001:3001"
 
   bc-frontend:
-    container_name: bookcars-frontend
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    image: aelassas/bookcars-frontend:latest
+    restart: always
     depends_on:
       - bc-backend
     environment:
       API_BASE_URL: ${API_BASE_URL}
-    ports:
-      - "8080:80"
-      - "8443:443"
     volumes:
       - cdn:/var/www/cdn/bookcars
 
