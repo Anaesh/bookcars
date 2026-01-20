@@ -29,7 +29,7 @@ services:
     build: 
       context: .
       dockerfile: ./backend/Dockerfile
-    env_file: ./backend/.env.docker
+    env_file: ./backend/.env
     restart: always
     ports:
       - 4002:4002
