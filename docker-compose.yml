@@ -23,8 +23,10 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD}
 
   bc-backend:
-    image: aelassas/bookcars-backend:latest
     restart: always
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     depends_on:
       - mongo
     environment:
@@ -40,16 +42,20 @@ services:
       - backend_logs:/bookcars/backend/logs
 
   bc-admin:
-    image: aelassas/bookcars-admin:latest
     restart: always
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
     depends_on:
       - bc-backend
     environment:
       REACT_APP_API_BASE_URL: ${API_BASE_URL}
 
   bc-frontend:
-    image: aelassas/bookcars-frontend:latest
     restart: always
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     depends_on:
       - bc-backend
     environment:
